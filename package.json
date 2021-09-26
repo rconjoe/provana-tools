@@ -1,0 +1,23 @@
+{
+  "name": "provana-tools",
+  "version": "0.0.1",
+  "description": "Utility cli for provana dev environment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "provana": "./bin/index.js"
+  },
+  "author": "Joe Carlton",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "clui": "^0.3.6",
+    "configstore": "^6.0.0",
+    "figlet": "^1.5.2",
+    "firebase": "^8.10.0",
+    "inquirer": "^8.1.5",
+    "shelljs": "^0.8.4"
+  }
+}
