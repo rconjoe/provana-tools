@@ -15,8 +15,10 @@
     "chalk": "^4.1.2",
     "clui": "^0.3.6",
     "configstore": "^6.0.0",
+    "dayjs": "^1.10.7",
     "figlet": "^1.5.2",
     "firebase": "^8.10.0",
+    "firebase-admin": "^9.11.1",
     "inquirer": "^8.1.5",
     "shelljs": "^0.8.4"
   }
