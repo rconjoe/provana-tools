@@ -19,6 +19,7 @@ const run = async () => {
   )
 
   // make test users
+  // TODO: handle if they're already created so you don't need to restart emus
   await admin.mockCreator()
   await admin.mockSupporter()
 
