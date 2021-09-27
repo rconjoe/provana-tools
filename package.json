@@ -1,15 +1,20 @@
 {
-  "name": "provana-tools",
+  "name": "@provana-developers/provana-tools",
   "version": "0.0.1",
   "description": "Utility cli for provana dev environment",
-  "main": "index.js",
+  "author": "Joe Carlton <joe@provana.gg>",
+  "url": "https://github.com/provana-developers/provana-tools/issues",
+  "main": "./bin/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
     "provana": "./bin/index.js"
   },
-  "author": "Joe Carlton",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": "git://github.com/provana-developers/provana-tools.git",
   "license": "UNLICENSED",
   "dependencies": {
     "chalk": "^4.1.2",
