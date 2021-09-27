@@ -8,3 +8,4 @@ Use this package for simulating user input (Client SDK) to mock calls from an en
 git clone https://github.com/provana-developers/provana-tools.git \
 npm i -g .
 ```
+***or*** see https://github.com/provana-developers/packages
