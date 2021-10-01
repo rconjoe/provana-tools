@@ -7,6 +7,7 @@ const db = require('../lib/db')
 const assertions = require('../lib/assertions')
 const util = require('../lib/util')
 const admin = require('../lib/admin')
+const nock = require('../lib/nock')
 
 
 const run = async () => {
@@ -150,13 +151,41 @@ const run = async () => {
         }
       case 'onSlotUpdate/':
         let slot_mf = await inquirer.chooseMF()
-        if (slot_mf === true) {
+        if (slot_mf.mf === true) {
           // mandatory fill sessions...
         }
         else {
-          let chooseSlotStatusChange = await inquirer.chooseSessionStatusChange()
-          switch (chooseSlotStatusChange.sessionStatusChange) {
-            // case slot status changes...
+          let chooseSlotStatusChange = await inquirer.chooseSlotStatusChange()
+          switch (chooseSlotStatusChange.slotStatusChange) {
+            case 'Published -> Holding':
+              await util.flushDb()
+              let publishedToHolding_data = await admin.mockService(1, false)
+              let publishedToHolding_session = await admin.mockSession('published', publishedToHolding_data.service)
+              let publishedToHolding_slot = await admin.mockSlotsForSession(publishedToHolding_session, ['published'])
+              let publishedToHolding_ready = await inquirer.ready()
+              if (publishedToHolding_ready.ready === true) {
+                let publishedToHolding_assert = await inquirer.assertions()
+                if (publishedToHolding_assert.assertions === true) {
+                  await admin.checkoutSlot(publishedToHolding_slot[0])
+                  console.log('\n Please wait...')
+                  setTimeout(async () => {
+                    await assertions.onSlotCheckout(publishedToHolding_slot[0])
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Ok, triggering...')
+                  await admin.checkoutSlot(publishedToHolding_slot[0])
+                }
+              }
+              else return
+            case 'Holding -> Booked':
+            case 'Holding -> Published':
+            case 'Booked -> Active':
+            case 'Booked -> Cancelled':
+            case 'Cancelled -> Published':
+            case 'Active -> Disputed':
+            case 'Disputed -> Resolved+':
+            case 'Disputed -> Resolved-':
           }
         }
       case 'registerSupporter':
@@ -171,6 +200,15 @@ const run = async () => {
       case 'confirmCheckoutComplete':
       case 'checkoutComplete':
       case 'startSlot':
+              // await util.flushDb()
+              // let publishedToActive_data = await admin.mockService(3, false)
+              // let publishedToActive_session = await admin.mockSession('published', publishedToActive_data.service)
+              // let publishedToActive_slots = await admin.mockSlotsForSession(publishedToActive_session, [
+              //   'published',
+              //   'booked',
+              //   'booked'
+              // ])
+              // nock.PaymentIntent_requires_capture()
       case 'capture':
       case 'writeNewReview':
       case 'getRecentReviews':
