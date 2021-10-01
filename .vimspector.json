@@ -10,11 +10,17 @@
       },
       "configuration": {
         "request": "launch",
+        "name": "Jest debugger",
+        "type": "node",
         "protocol": "auto",
-        "stopOnEntry": true,
         "console": "integratedTerminal",
-        "program": "${script:${file\\}}",
-        "cwd": "${workspaceRoot}"
+        "program": "${workspaceRoot}/node_modules/.bin/jest",
+        "cwd": "${workspaceRoot}",
+        "args": [
+          "tests/${FileName}.spec.js",
+          "-c",
+          "jest.config.js"
+        ]
       }
     }
   }
