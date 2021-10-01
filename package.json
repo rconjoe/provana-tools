@@ -17,6 +17,7 @@
   "repository": "git://github.com/provana-developers/provana-tools.git",
   "license": "UNLICENSED",
   "dependencies": {
+    "axios": "^0.21.4",
     "chalk": "^4.1.2",
     "clui": "^0.3.6",
     "configstore": "^6.0.0",
