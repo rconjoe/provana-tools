@@ -45,7 +45,7 @@ describe('Tests Admin SDK module', () => {
     expect(svcData.attendees).toBe(3)
   })
   it('Tests mockSession method', async () => {
-    let session = await admin.mockSession('potential', {
+    let session = await admin.mockSession('published', {
       id: '12345',
       serviceName: 'emulatedService',
       serviceDescription: 'Made by provana-tools',
@@ -65,6 +65,13 @@ describe('Tests Admin SDK module', () => {
     let ses = await admin.fs.collection('sessions').get()
     expect(ses.size).toBe(1)
     expect(ses.docs[0].data().serviceDocId).toBe('12345')
+    let chatroom = await admin.fs
+      .collection('chats')
+      .doc(ses.docs[0].id)
+      .get()
+    expect(chatroom.exists).toBeTrue()
+    expect(chatroom.data().creator).toBe('123abc')
+    expect(chatroom.data().users[0]).toBe('123abc')
   })
   it('Tests mockSlotsForSession method', async () => {
     await util.flushDb()
