@@ -1,8 +1,11 @@
 require('jest')
+require('jest-extended')
 const admin = require('../lib/admin')
 const util = require('../lib/util')
 const clientauth = require('../lib/auth')
+const dayjs = require('dayjs')
 
+jest.setTimeout(30000)
 describe('Tests Admin SDK module', () => {
   beforeEach(async () => {
     await util.flushDb()
@@ -62,5 +65,40 @@ describe('Tests Admin SDK module', () => {
     let ses = await admin.fs.collection('sessions').get()
     expect(ses.size).toBe(1)
     expect(ses.docs[0].data().serviceDocId).toBe('12345')
+  })
+  it('Tests mockSlotsForSession method', async () => {
+    await util.flushDb()
+    let now = dayjs().unix()
+    const session = {
+      sellerUid: '123abc',
+      slots: 3,
+      booked: 0,
+      serviceDocId: '1337',
+      mandatoryFill: false,
+      name: 'emulatedService',
+      color: 'blue',
+      serviceColor: 'blue',
+      start: 300 + now,
+      end: 1700 + now,
+      id: '12345',
+      status: 'published',
+    }
+    await admin.fs.collection('sessions')
+      .doc('12345')
+      .set(session)
+    await admin.mockSlotsForSession(session, [
+      'published',
+      'booked',
+      'full'
+    ])
+    const slots = await admin.fs.collection('sessions')
+      .doc('12345')
+      .collection('slots')
+      .get()
+    expect(slots.size).toBe(3)
+    slots.forEach(slot => {
+      expect(slot.data().name).toBe('emulatedService')
+      expect(slot.data().status).toBeOneOf(['published', 'booked', 'full'])
+    })
   })
 })
