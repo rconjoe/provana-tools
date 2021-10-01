@@ -72,11 +72,11 @@ const run = async () => {
           switch (chooseSessionStatusChange.sessionStatusChange) {
             case 'Potential -> Published':
               let potentialToPublished_data = await admin.mockService(3, false)
-              let potentialSession = await admin.mockPotentialSession(potentialToPublished_data.service)
-              let ready = inquirer.ready()
+              let potentialSession = await admin.mockSession('potential', potentialToPublished_data.service)
+              let ready = await inquirer.ready()
               if (ready.ready === true) {
-                let assertions = inquirer.assertions()
-                if (assertions.assert === true) {
+                let assertions = await inquirer.assertions()
+                if (assertions.assertions === true) {
                   await admin.potentialToPublished(potentialSession)
                   console.log('\n Please wait...')
                   setTimeout(async () => {
