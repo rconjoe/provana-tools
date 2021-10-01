@@ -41,4 +41,26 @@ describe('Tests Admin SDK module', () => {
     expect(svcData.mandatoryFill).toBe(false)
     expect(svcData.attendees).toBe(3)
   })
+  it('Tests mockSession method', async () => {
+    const session = await admin.mockSession('potential', {
+      id: '12345',
+      serviceName: 'emulatedService',
+      serviceDescription: 'Made by provana-tools',
+      serviceCost: 23,
+      serviceLength: 60,
+      tags: ['cats', 'womp', 'gleep'],
+      color: 'blue',
+      software: 'Vim',
+      attendees: 3,
+      mandatoryFill: false,
+      sessionDocIdArray: [],
+      uid: '123abc',
+      stripePrice: 'price_123',
+      active: true,
+    })
+    expect(session.name).toBe('emulatedService')
+    let ses = await admin.fs.collection('sessions').get()
+    expect(ses.size).toBe(1)
+    expect(ses.docs[0].data().serviceDocId).toBe('12345')
+  })
 })
