@@ -71,7 +71,23 @@ const run = async () => {
           let chooseSessionStatusChange = await inquirer.chooseSessionStatusChange()
           switch (chooseSessionStatusChange.sessionStatusChange) {
             case 'Potential -> Published':
-              const potentialToPublished_svc = await admin.mockService(3, false)
+              let potentialToPublished_data = await admin.mockService(3, false)
+              let potentialSession = await admin.mockPotentialSession(potentialToPublished_data.service)
+              let ready = inquirer.ready()
+              if (ready.ready === true) {
+                let assertions = inquirer.assertions()
+                if (assertions.assert === true) {
+                  await admin.potentialToPublished(potentialSession)
+                  console.log('\n Please wait...')
+                  setTimeout(async () => {
+                    await assertions.potentialToPublished()
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Triggering...')
+                  await admin.potentialToPublished(potentialSession)
+                }
+              }
             case 'Published -> Full':
             case 'Published -> Active':
             case 'Published -> Cancelled':
