@@ -99,26 +99,26 @@ const run = async () => {
             case 'Active -> Succeeded':
             case 'Increment booked value to fill session':
               await util.flushDb()
-              let publishedToFull_data = await admin.mockService(3, false)
-              let publishedToFull = await admin.mockSession('published', publishedToFull_data.service)
-              await admin.mockSlotsForSession(publishedToFull, [
+              let incrementToFull_data = await admin.mockService(3, false)
+              let incrementToFull = await admin.mockSession('published', incrementToFull_data.service)
+              await admin.mockSlotsForSession(incrementToFull, [
                 'booked',
                 'booked',
                 'holding'
               ])
-              let publishedToFull_ready = await inquirer.ready()
-              if (publishedToFull_ready.ready === true) {
-                let publishedToFull_assert = await inquirer.assertions()
-                if (publishedToFull_assert.assertions === true) {
-                  await admin.incrementSession(publishedToFull.id)
+              let incrementToFull_ready = await inquirer.ready()
+              if (incrementToFull_ready.ready === true) {
+                let incrementToFull_assert = await inquirer.assertions()
+                if (incrementToFull_assert.assertions === true) {
+                  await admin.incrementSession(incrementToFull.id)
                   console.log('\n Please wait...')
                   setTimeout(async () => {
-                    await assertions.onSessionIncrement(publishedToFull.id)
+                    await assertions.onSessionIncrement(incrementToFull.id)
                   }, 5000)
                 }
                 else {
                   console.log('\n Triggering...')
-                  await admin.incrementSession(publishedToFull.id)
+                  await admin.incrementSession(incrementToFull.id)
                 }
               }
               return
