@@ -75,10 +75,10 @@ const run = async () => {
             case 'Potential -> Published':
               let potentialToPublished_data = await admin.mockService(3, false)
               let potentialSession = await admin.mockSession('potential', potentialToPublished_data.service)
-              let ready = await inquirer.ready()
-              if (ready.ready === true) {
-                let assert = await inquirer.assertions()
-                if (assert.assertions === true) {
+              let potentialToPublished_ready = await inquirer.ready()
+              if (potentialToPublished_ready.ready === true) {
+                let potentialToPublished_assert = await inquirer.assertions()
+                if (potentialToPublished_assert.assertions === true) {
                   await admin.potentialToPublished(potentialSession)
                   console.log('\n Please wait...')
                   setTimeout(async () => {
@@ -97,6 +97,31 @@ const run = async () => {
             case 'Full -> Active':
             case 'Full -> Cancelled':
             case 'Active -> Succeeded':
+            case 'Increment booked value to fill session':
+              await util.flushDb()
+              let publishedToFull_data = await admin.mockService(3, false)
+              let publishedToFull = await admin.mockSession('published', publishedToFull_data.service)
+              await admin.mockSlotsForSession(publishedToFull, [
+                'booked',
+                'booked',
+                'holding'
+              ])
+              let publishedToFull_ready = await inquirer.ready()
+              if (publishedToFull_ready.ready === true) {
+                let publishedToFull_assert = await inquirer.assertions()
+                if (publishedToFull_assert.assertions === true) {
+                  await admin.incrementSession(publishedToFull.id)
+                  console.log('\n Please wait...')
+                  setTimeout(async () => {
+                    await assertions.onSessionIncrement(publishedToFull.id)
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Triggering...')
+                  await admin.incrementSession(publishedToFull.id)
+                }
+              }
+              return
           }
         }
       case 'onSlotUpdate/':
@@ -105,8 +130,8 @@ const run = async () => {
           // mandatory fill sessions...
         }
         else {
-          // let chooseSlotStatusChange = await inquirer.chooseSlotStatusChange()
-          switch (chooseSlotStatusChange.slotStatusChange) {
+          let chooseSlotStatusChange = await inquirer.chooseSessionStatusChange()
+          switch (chooseSlotStatusChange.sessionStatusChange) {
             // case slot status changes...
           }
         }
