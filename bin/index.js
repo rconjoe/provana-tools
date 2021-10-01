@@ -4,7 +4,8 @@ const figlet = require('figlet')
 const inquirer = require('../lib/inquirer')
 const Auth = require('../lib/auth')
 const db = require('../lib/db')
-// const functions = require('../lib/functions')
+const assertions = require('../lib/assertions')
+const util = require('../lib/util')
 const admin = require('../lib/admin')
 
 
@@ -63,6 +64,7 @@ const run = async () => {
     let functions = await inquirer.chooseFunction()
     switch (functions.functions) {
       case 'onSessionUpdate/':
+        await util.flushDb()
         let session_mf = await inquirer.chooseMF()
         if (session_mf === true) {
           // mandatory fill sessions...
@@ -75,8 +77,8 @@ const run = async () => {
               let potentialSession = await admin.mockSession('potential', potentialToPublished_data.service)
               let ready = await inquirer.ready()
               if (ready.ready === true) {
-                let assertions = await inquirer.assertions()
-                if (assertions.assertions === true) {
+                let assert = await inquirer.assertions()
+                if (assert.assertions === true) {
                   await admin.potentialToPublished(potentialSession)
                   console.log('\n Please wait...')
                   setTimeout(async () => {
@@ -88,6 +90,7 @@ const run = async () => {
                   await admin.potentialToPublished(potentialSession)
                 }
               }
+              return
             case 'Published -> Full':
             case 'Published -> Active':
             case 'Published -> Cancelled':
@@ -102,7 +105,7 @@ const run = async () => {
           // mandatory fill sessions...
         }
         else {
-          let chooseSlotStatusChange = await inquirer.chooseSlotStatusChange()
+          // let chooseSlotStatusChange = await inquirer.chooseSlotStatusChange()
           switch (chooseSlotStatusChange.slotStatusChange) {
             // case slot status changes...
           }
