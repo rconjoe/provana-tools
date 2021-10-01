@@ -92,6 +92,30 @@ const run = async () => {
               }
               return
             case 'Published -> Full':
+              await util.flushDb()
+              let publishedToFull_data = await admin.mockService(3, false)
+              let publishedToFull = await admin.mockSession('published', publishedToFull_data.service)
+              await admin.mockSlotsForSession(publishedToFull, [
+                'booked',
+                'booked',
+                'booked'
+              ])
+              let publishedToFull_ready = await inquirer.ready()
+              if (publishedToFull_ready.ready === true) {
+                let publishedToFull_assert = await inquirer.assertions()
+                if (publishedToFull_assert.assertions === true) {
+                  await admin.publishedToFull(publishedToFull.id)
+                  console.log('\n Please wait...')
+                  setTimeout(async () =>{
+                    await assertions.onSessionFull(publishedToFull)
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Triggering...')
+                  await admin.publishedToFull(publishedToFull.id)
+                }
+              }
+              return
             case 'Published -> Active':
             case 'Published -> Cancelled':
             case 'Full -> Active':
