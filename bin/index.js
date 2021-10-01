@@ -12,19 +12,14 @@ const run = async () => {
 
   // logo
   console.log(
-    chalk.ansi256(13)(figlet.textSync(
+    chalk.cyan((figlet.textSync(
       'provana-tools',
       { horizontalLayout: 'full' }
-    ))
+    )))
   )
 
-  // make test users
-  // TODO: handle if they're already created so you don't need to restart emus
-  await admin.mockCreator()
-  await admin.mockSupporter()
-
   let category = await inquirer.chooseCategory()
-  if (category.category === 'Simulate User Input') {
+  if (category.category === 'Simulate User Input (Client SDK)') {
 
     let auth = await inquirer.chooseAuth()
     if (auth.auth === 'Creator') {
@@ -64,8 +59,55 @@ const run = async () => {
     }
   }
 
-  else if (category.category === 'Test API functions') {
-    console.log('hi')
+  else if (category.category === 'Functions Testing (Admin SDK)') {
+    let functions = await inquirer.chooseFunction()
+    switch (functions.functions) {
+      case 'onSessionUpdate/':
+        let session_mf = await inquirer.chooseMF()
+        if (session_mf === true) {
+          // mandatory fill sessions...
+        }
+        else {
+          let chooseSessionStatusChange = await inquirer.chooseSessionStatusChange()
+          switch (chooseSessionStatusChange.sessionStatusChange) {
+            case 'Potential -> Published':
+              const potentialToPublished_svc = await admin.mockService(3, false)
+            case 'Published -> Full':
+            case 'Published -> Active':
+            case 'Published -> Cancelled':
+            case 'Full -> Active':
+            case 'Full -> Cancelled':
+            case 'Active -> Succeeded':
+          }
+        }
+      case 'onSlotUpdate/':
+        let slot_mf = await inquirer.chooseMF()
+        if (slot_mf === true) {
+          // mandatory fill sessions...
+        }
+        else {
+          let chooseSlotStatusChange = await inquirer.chooseSlotStatusChange()
+          switch (chooseSlotStatusChange.slotStatusChange) {
+            // case slot status changes...
+          }
+        }
+      case 'registerSupporter':
+      case 'getOrCreateInvitation':
+      case 'validateInvitation':
+      case 'registerCreator':
+      case 'stripeAccountOnboard':
+      case 'stripeCompleteOnboard':
+      case 'createService':
+      case 'publishPotential':
+      case 'checkout':
+      case 'confirmCheckoutComplete':
+      case 'checkoutComplete':
+      case 'startSlot':
+      case 'capture':
+      case 'writeNewReview':
+      case 'getRecentReviews':
+      case 'getReviewScore':
+    }
   }
   else console.log(`\n (× _ ×# \n You broke it D: \n`)
 }
