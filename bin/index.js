@@ -179,6 +179,32 @@ const run = async () => {
               }
               else return
             case 'Holding -> Booked':
+              await util.flushDb()
+              let holdingToBooked_data = await admin.mockService(1, false)
+              let holdingToBooked_session = await admin.mockSession('published', holdingToBooked_data.service)
+              let holdingToBooked_slots = await admin.mockSlotsForSession(holdingToBooked_session, ['holding'])
+              let holdingToBooked_supporter = await admin.mockSupporter()
+              await admin.fs.collection('sessions').doc(holdingToBooked_slots[0].parentSession)
+                .collection('slots').doc(holdingToBooked_slots[0].id).update({
+                  buyerUid: holdingToBooked_supporter.uid,
+                  buyerUsername: holdingToBooked_supporter.username,
+                  paymentIntent: 'pi_123',
+                })
+              let holdingToBooked_ready = await inquirer.ready()
+              if (holdingToBooked_ready.ready === true) {
+                let holdingToBooked_assertions = await inquirer.assertions()
+                if (holdingToBooked_assertions.assertions === true) {
+                  await admin.holdingToBooked(holdingToBooked_slots[0])
+                  console.log('\n Please wait...')
+                  setTimeout(async () => {
+                    await assertions.onSlotBooked(holdingToBooked_slots[0])
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Ok, triggering...')
+                  await admin.holdingToBooked(holdingToBooked_slots[0])
+                }
+              }
             case 'Holding -> Published':
             case 'Booked -> Active':
             case 'Booked -> Cancelled':
