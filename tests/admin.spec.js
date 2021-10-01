@@ -105,4 +105,34 @@ describe('Tests Admin SDK module', () => {
       .get()
     expect(ses.data().booked).toBe(1)
   })
+  it('Tests publishedToFull method', async () => {
+    const now = dayjs().unix()
+    await util.flushDb()
+    let session = {
+      sellerUid: '123abc',
+      slots: 3,
+      booked: 3,
+      serviceDocId: '1337',
+      mandatoryFill: false,
+      name: 'emulatedService',
+      color: 'blue',
+      serviceColor: 'blue',
+      start: 300 + now,
+      end: 1700 + now,
+      id: '12345',
+      status: 'published',
+    }
+    await admin.fs.collection('sessions')
+      .doc('12345')
+      .set(session)
+      .catch(err => {
+        console.error(err)
+      })
+    await admin.publishedToFull(session.id)
+    let ses = await admin.fs
+      .collection('sessions')
+      .doc(session.id)
+      .get()
+    expect(ses.data().status).toBe('full')
+  })
 })
