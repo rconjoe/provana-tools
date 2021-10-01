@@ -86,11 +86,12 @@ describe('Tests Admin SDK module', () => {
     await admin.fs.collection('sessions')
       .doc('12345')
       .set(session)
-    await admin.mockSlotsForSession(session, [
+    const _ = await admin.mockSlotsForSession(session, [
       'published',
       'booked',
       'full'
     ])
+    expect(_.length).toBe(3)
     let slots = await admin.fs.collection('sessions')
       .doc('12345')
       .collection('slots')
