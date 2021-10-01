@@ -45,7 +45,7 @@ describe('Tests Admin SDK module', () => {
     expect(svcData.attendees).toBe(3)
   })
   it('Tests mockSession method', async () => {
-    const session = await admin.mockSession('potential', {
+    let session = await admin.mockSession('potential', {
       id: '12345',
       serviceName: 'emulatedService',
       serviceDescription: 'Made by provana-tools',
@@ -69,7 +69,7 @@ describe('Tests Admin SDK module', () => {
   it('Tests mockSlotsForSession method', async () => {
     await util.flushDb()
     let now = dayjs().unix()
-    const session = {
+    let session = {
       sellerUid: '123abc',
       slots: 3,
       booked: 0,
@@ -91,7 +91,7 @@ describe('Tests Admin SDK module', () => {
       'booked',
       'full'
     ])
-    const slots = await admin.fs.collection('sessions')
+    let slots = await admin.fs.collection('sessions')
       .doc('12345')
       .collection('slots')
       .get()
@@ -100,5 +100,9 @@ describe('Tests Admin SDK module', () => {
       expect(slot.data().name).toBe('emulatedService')
       expect(slot.data().status).toBeOneOf(['published', 'booked', 'full'])
     })
+    let ses = await admin.fs.collection('sessions')
+      .doc('12345')
+      .get()
+    expect(ses.data().booked).toBe(1)
   })
 })
