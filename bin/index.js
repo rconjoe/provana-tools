@@ -205,8 +205,37 @@ const run = async () => {
                   await admin.holdingToBooked(holdingToBooked_slots[0])
                 }
               }
-            case 'Holding -> Published':
             case 'Booked -> Active':
+              await util.flushDb()
+              let bookedToActive_data = await admin.mockService(2, false)
+              let bookedToActive_session = await admin.mockSession('full', bookedToActive_data.service)
+              let bookedToActive_supporter = await admin.mockSupporter()
+              let bookedToActive_slots = await admin.mockSlotsForSession(bookedToActive_session, [
+                'holding',
+                'published'
+              ])
+              await admin.fs.collection('sessions').doc(bookedToActive_session.id)
+                .collection('slots').doc(bookedToActive_slots[0].id).update({
+                  buyerUid: bookedToActive_supporter.uid,
+                  buyerUsername: bookedToActive_supporter.username,
+                  paymentIntent: 'pi_123',
+                })
+              let bookedToActive_ready = await inquirer.ready()
+              if (bookedToActive_ready.ready === true) {
+                let bookedToActive_assert = await inquirer.assertions()
+                if (bookedToActive_assert.assertions === true) {
+                  await admin.slotBookedToActive(bookedToActive_slots[0])
+                  console.log('\n Please wait...')
+                  setTimeout(async () =>{
+                    await assertions.onSlotActive(bookedToActive_supporter.uid)
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Ok, triggering...')
+                  await admin.slotBookedToActive(bookedToActive.slots[0])
+                }
+              }
+
             case 'Booked -> Cancelled':
             case 'Cancelled -> Published':
             case 'Active -> Disputed':
