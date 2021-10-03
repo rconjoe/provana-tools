@@ -139,6 +139,25 @@ const run = async () => {
               return
             case 'Published -> Cancelled':
             case 'Full -> Active':
+              await util.flushDb()
+              let fullToActive_data = await admin.mockService(3, false)
+              let fullToActive_session = await admin.mockSession('full', fullToActive_data.service)
+              let fullToActive_ready = await inquirer.ready()
+              if (fullToActive_ready.ready === true) {
+                let fullToActive_assertions = await inquirer.assertions()
+                if (fullToActive_assertions.assertions === true) {
+                  await admin.fullToActive(fullToActive_session.id)
+                  console.log('\n Please wait...')
+                  setTimeout(async () => {
+                    await assertions.fullToActive(fullToActive_session.sellerUid)
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Ok, triggering...')
+                  await admin.fullToActive(fullToActive_session.id)
+                }
+              }
+              return
             case 'Full -> Cancelled':
             case 'Active -> Succeeded':
             case 'Increment booked value to fill session':
