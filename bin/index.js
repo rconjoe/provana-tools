@@ -118,6 +118,25 @@ const run = async () => {
               }
               return
             case 'Published -> Active':
+              await util.flushDb()
+              let publishedToActive_data = await admin.mockService(3, false)
+              let publishedToActive_session = await admin.mockSession('published', publishedToActive_data.service)
+              let publishedToActive_ready = await inquirer.ready()
+              if (publishedToActive_ready.ready === true) {
+                let publishedToActive_assertions = await inquirer.assertions()
+                if (publishedToActive_assertions.assertions === true) {
+                  await admin.publishedToActive(publishedToActive_session.id)
+                  console.log('\n Please wait...')
+                  setTimeout(async () => {
+                    await assertions.publishedToActive(publishedToActive_session.sellerUid)
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Ok, triggering...')
+                  await admin.publishedToActive(publishedToActive_session.id)
+                }
+              }
+              return
             case 'Published -> Cancelled':
             case 'Full -> Active':
             case 'Full -> Cancelled':
@@ -177,7 +196,7 @@ const run = async () => {
                   await admin.checkoutSlot(publishedToHolding_slot[0])
                 }
               }
-              else return
+              return
             case 'Holding -> Booked':
               await util.flushDb()
               let holdingToBooked_data = await admin.mockService(1, false)
@@ -242,6 +261,7 @@ const run = async () => {
             case 'Disputed -> Resolved+':
             case 'Disputed -> Resolved-':
           }
+          return
         }
       case 'registerSupporter':
       case 'getOrCreateInvitation':
