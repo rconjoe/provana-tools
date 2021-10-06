@@ -11,7 +11,7 @@
       "configuration": {
         "request": "launch",
         "protocol": "auto",
-        "stopOnEntry": true,
+        "stopOnEntry": false,
         "console": "integratedTerminal",
         "program": "${script:${file\\}}",
         "cwd": "${workspaceRoot}"
