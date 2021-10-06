@@ -7,7 +7,7 @@ const db = require('../lib/db')
 const assertions = require('../lib/assertions')
 const util = require('../lib/util')
 const admin = require('../lib/admin')
-const nock = require('../lib/nock')
+// const nock = require('../lib/nock')
 
 
 const run = async () => {
@@ -66,6 +66,7 @@ const run = async () => {
     switch (functions.functions) {
       case 'onSessionUpdate/':
         await util.flushDb()
+        await util.flushAuth()
         let session_mf = await inquirer.chooseMF()
         if (session_mf === true) {
           // mandatory fill sessions...
@@ -94,6 +95,7 @@ const run = async () => {
               return
             case 'Published -> Full':
               await util.flushDb()
+              await util.flushAuth()
               let publishedToFull_data = await admin.mockService(3, false)
               let publishedToFull = await admin.mockSession('published', publishedToFull_data.service)
               await admin.mockSlotsForSession(publishedToFull, [
@@ -119,6 +121,7 @@ const run = async () => {
               return
             case 'Published -> Active':
               await util.flushDb()
+              await util.flushAuth()
               let publishedToActive_data = await admin.mockService(3, false)
               let publishedToActive_session = await admin.mockSession('published', publishedToActive_data.service)
               let publishedToActive_ready = await inquirer.ready()
@@ -140,6 +143,7 @@ const run = async () => {
             case 'Published -> Cancelled':
             case 'Full -> Active':
               await util.flushDb()
+              await util.flushAuth()
               let fullToActive_data = await admin.mockService(3, false)
               let fullToActive_session = await admin.mockSession('full', fullToActive_data.service)
               let fullToActive_ready = await inquirer.ready()
@@ -159,9 +163,11 @@ const run = async () => {
               }
               return
             case 'Full -> Cancelled':
+              // seller cancels full session
             case 'Active -> Succeeded':
             case 'Increment booked value to fill session':
               await util.flushDb()
+              await util.flushAuth()
               let incrementToFull_data = await admin.mockService(3, false)
               let incrementToFull = await admin.mockSession('published', incrementToFull_data.service)
               await admin.mockSlotsForSession(incrementToFull, [
@@ -197,6 +203,7 @@ const run = async () => {
           switch (chooseSlotStatusChange.slotStatusChange) {
             case 'Published -> Holding':
               await util.flushDb()
+              await util.flushAuth()
               let publishedToHolding_data = await admin.mockService(1, false)
               let publishedToHolding_session = await admin.mockSession('published', publishedToHolding_data.service)
               let publishedToHolding_slot = await admin.mockSlotsForSession(publishedToHolding_session, ['published'])
@@ -218,14 +225,15 @@ const run = async () => {
               return
             case 'Holding -> Booked':
               await util.flushDb()
+              await util.flushAuth()
               let holdingToBooked_data = await admin.mockService(1, false)
               let holdingToBooked_session = await admin.mockSession('published', holdingToBooked_data.service)
               let holdingToBooked_slots = await admin.mockSlotsForSession(holdingToBooked_session, ['holding'])
-              let holdingToBooked_supporter = await admin.mockSupporter()
+              let holdingToBooked_supporter = await admin.mockSupporter([1])
               await admin.fs.collection('sessions').doc(holdingToBooked_slots[0].parentSession)
                 .collection('slots').doc(holdingToBooked_slots[0].id).update({
-                  buyerUid: holdingToBooked_supporter.uid,
-                  buyerUsername: holdingToBooked_supporter.username,
+                  buyerUid: holdingToBooked_supporter[0].uid,
+                  buyerUsername: holdingToBooked_supporter[0].username,
                   paymentIntent: 'pi_123',
                 })
               let holdingToBooked_ready = await inquirer.ready()
@@ -243,19 +251,21 @@ const run = async () => {
                   await admin.holdingToBooked(holdingToBooked_slots[0])
                 }
               }
+              return
             case 'Booked -> Active':
               await util.flushDb()
+              await util.flushAuth()
               let bookedToActive_data = await admin.mockService(2, false)
               let bookedToActive_session = await admin.mockSession('full', bookedToActive_data.service)
-              let bookedToActive_supporter = await admin.mockSupporter()
+              let bookedToActive_supporter = await admin.mockSupporter([1])
               let bookedToActive_slots = await admin.mockSlotsForSession(bookedToActive_session, [
                 'holding',
                 'published'
               ])
               await admin.fs.collection('sessions').doc(bookedToActive_session.id)
                 .collection('slots').doc(bookedToActive_slots[0].id).update({
-                  buyerUid: bookedToActive_supporter.uid,
-                  buyerUsername: bookedToActive_supporter.username,
+                  buyerUid: bookedToActive_supporter[0].uid,
+                  buyerUsername: bookedToActive_supporter[0].username,
                   paymentIntent: 'pi_123',
                 })
               let bookedToActive_ready = await inquirer.ready()
@@ -265,7 +275,7 @@ const run = async () => {
                   await admin.slotBookedToActive(bookedToActive_slots[0])
                   console.log('\n Please wait...')
                   setTimeout(async () =>{
-                    await assertions.onSlotActive(bookedToActive_supporter.uid)
+                    await assertions.onSlotActive(bookedToActive_supporter[0].uid)
                   }, 5000)
                 }
                 else {
@@ -273,8 +283,65 @@ const run = async () => {
                   await admin.slotBookedToActive(bookedToActive.slots[0])
                 }
               }
-
-            case 'Booked -> Cancelled':
+              return
+            case 'Booked -> Cancelled (not full)':
+              await util.flushDb()
+              await util.flushAuth()
+              let bookedToCancelled_data = await admin.mockService(3, false)
+              let bookedToCancelled_session = await admin.mockSession('published', bookedToCancelled_data.service)
+              let bookedToCancelled_supporter = await admin.mockSupporter([1])
+              let bookedToCancelled_slots = await admin.mockSlotsForSession(bookedToCancelled_session, [
+                'holding',
+                'published',
+                'published'
+              ])
+              let bookedToCancelled_booked = await admin.mockSlotPurchase(bookedToCancelled_slots[0], bookedToCancelled_supporter[0])
+              let bookedToCancelled_ready = await inquirer.ready()
+              if (bookedToCancelled_ready.ready === true) {
+                let bookedToCancelled_assertions = await inquirer.assertions()
+                if (bookedToCancelled_assertions.assertions === true) {
+                  await admin.bookedToCancelled(bookedToCancelled_booked)
+                  console.log('\n Please wait...')
+                  setTimeout(async () => {
+                    await assertions.bookedToCancelled(bookedToCancelled_booked)
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Ok, triggering...')
+                  await admin.bookedToCancelled(bookedToCancelled_booked)
+                }
+              }
+              return
+            case 'Booked -> Cancelled (full)':
+              await util.flushDb()
+              await util.flushAuth()
+              let bookedToCancelled_full_data = await admin.mockService(3, false)
+              let bookedToCancelled_full_session = await admin.mockSession('published', bookedToCancelled_full_data.service)
+              let bookedToCancelled_full_supporter = await admin.mockSupporter([1, 2, 3])
+              let bookedToCancelled_full_slots = await admin.mockSlotsForSession(bookedToCancelled_full_session, [
+                'holding',
+                'holding',
+                'holding'
+              ])
+              let bookedToCancelled_full_booked_1 = await admin.mockSlotPurchase(bookedToCancelled_full_slots[0], bookedToCancelled_full_supporter[0])
+              await admin.mockSlotPurchase(bookedToCancelled_full_slots[1], bookedToCancelled_full_supporter[1])
+              await admin.mockSlotPurchase(bookedToCancelled_full_slots[2], bookedToCancelled_full_supporter[2])
+              let bookedToCancelled_full_ready = await inquirer.ready()
+              if (bookedToCancelled_full_ready.ready === true) {
+                let bookedToCancelled_full_assertions = await inquirer.assertions()
+                if (bookedToCancelled_full_assertions.assertions === true) {
+                  await admin.bookedToCancelled(bookedToCancelled_full_booked_1)
+                  console.log('\n Please wait...')
+                  setTimeout(async () => {
+                    await assertions.bookedToCancelled_full(bookedToCancelled_full_booked_1)
+                  }, 5000)
+                }
+                else {
+                  console.log('\n Ok, triggering...')
+                  await admin.bookedToCancelled(bookedToCancelled_full_booked_1)
+                }
+              }
+              return
             case 'Cancelled -> Published':
             case 'Active -> Disputed':
             case 'Disputed -> Resolved+':
@@ -295,6 +362,7 @@ const run = async () => {
       case 'checkoutComplete':
       case 'startSlot':
               // await util.flushDb()
+              // await util.flushAuth()
               // let publishedToActive_data = await admin.mockService(3, false)
               // let publishedToActive_session = await admin.mockSession('published', publishedToActive_data.service)
               // let publishedToActive_slots = await admin.mockSlotsForSession(publishedToActive_session, [
