@@ -36,11 +36,6 @@ const run = async () => {
           await db.writePotential(user.uid)
           console.log('Complete.')
           return
-        case 'Publish session: requires .publishSession/':
-          await db.publishSession()
-          console.log('Complete.')
-          return
-        default: return
       }
     }
 
