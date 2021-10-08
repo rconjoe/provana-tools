@@ -186,6 +186,7 @@ describe('Tests Admin SDK module', () => {
     let _ses = admin.fs.collection('sessions')
       .doc(slots[0].parentSession)
     let ses = await _ses.get()
+    console.log(ses)
     expect(ses.data().booked).toBe(1)
     let slotq = await _ses.collection('slots').where('status', '==', 'booked').get()
     expect(slotq.empty).toBeFalse()
