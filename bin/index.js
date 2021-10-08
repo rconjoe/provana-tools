@@ -4,12 +4,9 @@ const figlet = require('figlet')
 const inquirer = require('../lib/inquirer')
 const Auth = require('../lib/auth')
 const db = require('../lib/db')
-const assertions = require('../lib/assertions')
 const util = require('../lib/util')
-const admin = require('../lib/admin')
 const onSessionUpdate = require('../lib/blocks/onSessionUpdate')
 const onSlotUpdate = require('../lib/blocks/onSlotUpdate')
-// const nock = require('../lib/nock')
 
 
 const run = async () => {
@@ -68,22 +65,21 @@ const run = async () => {
         if (session_mf.mf === true) {
           await onSessionUpdate_mf.default()
         }
-        else if (session_mf.mf === false) {
+        else {
           await onSessionUpdate.default()
-          return
         }
+        return
       case 'onSlotUpdate/':
         await util.flushDb()
         await util.flushAuth()
         let slot_mf = await inquirer.chooseMF()
         if (slot_mf.mf === true) {
           await onSlotUpdate_mf.default()
-          return
         }
         else {
           await onSlotUpdate.default()
-          return
         }
+        return
       case 'registerSupporter':
       case 'getOrCreateInvitation':
       case 'validateInvitation':
