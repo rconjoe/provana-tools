@@ -4,6 +4,7 @@ const admin = require('../lib/admin')
 const util = require('../lib/util')
 const clientauth = require('../lib/auth')
 const dayjs = require('dayjs')
+const db = require("../lib/db")
 
 jest.setTimeout(30000)
 describe('Tests Admin SDK module', () => {
@@ -196,5 +197,22 @@ describe('Tests Admin SDK module', () => {
     let task = await admin.fs.collection('tasks').doc(slotq.docs[0].id).get()
     expect(task.exists).toBeTrue()
     expect(task.data().task).toBeTruthy()
+  })
+  
+  it('Tests that a new Supporter can be created without loggin in', async () => {
+    await util.flushAuth();
+    await util.flushDb();
+    const createSupporter = await admin.mockSupporter([1]);
+    const newSupporter = createSupporter[0];
+    const SupporterFromDb = await db.fetchSupporter(newSupporter.uid);
+
+    expect(newSupporter.uid).toBe(SupporterFromDb.uid);
+    expect(newSupporter.customer).toBe(SupporterFromDb.customer);
+    expect(newSupporter.email).toBe(SupporterFromDb.email);
+    expect(newSupporter.username).toBe(SupporterFromDb.username);
+    expect(newSupporter.timezone).toBe(SupporterFromDb.timezone);
+    expect(newSupporter.avatar).toBe(SupporterFromDb.avatar);
+    expect(newSupporter.banner).toBe(SupporterFromDb.banner);
+    expect(newSupporter.online).toBe(SupporterFromDb.online);
   })
 })
