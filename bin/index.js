@@ -9,6 +9,7 @@ const util = require('../lib/util')
 const admin = require('../lib/admin')
 const onSessionUpdate = require('../lib/blocks/onSessionUpdate')
 const onSlotUpdate = require('../lib/blocks/onSlotUpdate')
+const registerSupporter = require('../lib/blocks/registerSupporter')
 // const nock = require('../lib/nock')
 
 
@@ -84,7 +85,13 @@ const run = async () => {
           await onSlotUpdate.default()
           return
         }
+        
       case 'registerSupporter':
+        await util.flushDb();
+        await util.flushAuth()
+        await registerSupporter.default()
+        return
+
       case 'getOrCreateInvitation':
       case 'validateInvitation':
       case 'registerCreator':
