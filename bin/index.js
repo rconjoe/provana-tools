@@ -79,8 +79,13 @@ const run = async () => {
         else {
           await onSlotUpdate.default()
         }
-        return
+        
       case 'registerSupporter':
+        await util.flushDb();
+        await util.flushAuth()
+        await registerSupporter.default()
+        return
+
       case 'getOrCreateInvitation':
       case 'validateInvitation':
       case 'registerCreator':
