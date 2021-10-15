@@ -7,7 +7,7 @@ const db = require('../lib/db')
 const util = require('../lib/util')
 const onSessionUpdate = require('../lib/blocks/onSessionUpdate')
 const onSlotUpdate = require('../lib/blocks/onSlotUpdate')
-const registerSupporter = require('lib/blocks/registerSupporter')
+const registerSupporter = require('../lib/blocks/registerSupporter')
 
 
 const run = async () => {
