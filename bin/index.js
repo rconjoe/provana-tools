@@ -8,7 +8,7 @@ const util = require('../lib/util')
 const onSessionUpdate = require('../lib/blocks/onSessionUpdate')
 const onSlotUpdate = require('../lib/blocks/onSlotUpdate')
 const registerSupporter = require('../lib/blocks/registerSupporter')
-
+const genTestUser = require('../lib/blocks/generateTestUser')
 
 const run = async () => {
 
@@ -113,6 +113,17 @@ const run = async () => {
       case 'getRecentReviews':
       case 'getReviewScore':
     }
+  }
+  else if (category.category === 'Generate Test Users') {
+    await genTestUser.default()
+  }
+  else if (category.category === 'Flush Emulators') {
+    let yousure = await inquirer.yousure()
+    if (yousure.yep === true) {
+      await util.flushDb()
+      await util.flushAuth()
+    }
+    else return
   }
   else console.log(`\n (× _ ×# \n You broke it D: \n`)
 }
