@@ -55,7 +55,16 @@ const run = async () => {
     }
 
     else if (auth.auth === 'Anonymous') {
-      console.log('Nothing yet...')
+      console.log('proceeding as a non loged in user... \n');
+      let action = await inquirer.chooseAnonAction()
+      switch (action.action) {
+        case 'Register New Supporter':
+        // await util.flushAuth();
+        // await util.flushDb();
+        await registerSupporter.anon()
+        break
+      }
+      return
     }
   }
 
