@@ -10,6 +10,7 @@ jest.setTimeout(30000)
 describe('Tests Admin SDK module', () => {
   beforeEach(async () => {
     await util.flushDb()
+    await util.flushAuth()
   })
   it('Verifies SDK initialization', () => {
     expect(admin.admin.apps.length).toEqual(1)
@@ -198,7 +199,7 @@ describe('Tests Admin SDK module', () => {
     expect(task.exists).toBeTrue()
     expect(task.data().task).toBeTruthy()
   })
-  
+
   it('Tests that a new Supporter can be created without loggin in', async () => {
     await util.flushAuth();
     await util.flushDb();
