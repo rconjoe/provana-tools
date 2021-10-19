@@ -60,8 +60,6 @@ const run = async () => {
     let functions = await inquirer.chooseFunction()
     switch (functions.functions) {
       case 'onSessionUpdate/':
-        await util.flushDb()
-        await util.flushAuth()
         let session_mf = await inquirer.chooseMF()
         if (session_mf.mf === true) {
           await onSessionUpdate_mf.default()
@@ -71,8 +69,6 @@ const run = async () => {
         }
         return
       case 'onSlotUpdate/':
-        await util.flushDb()
-        await util.flushAuth()
         let slot_mf = await inquirer.chooseMF()
         if (slot_mf.mf === true) {
           await onSlotUpdate_mf.default()
@@ -82,8 +78,6 @@ const run = async () => {
         }
 
       case 'registerSupporter':
-        await util.flushDb();
-        await util.flushAuth()
         await registerSupporter.default()
         return
 
