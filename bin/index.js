@@ -9,6 +9,7 @@ const onSessionUpdate = require('../lib/blocks/onSessionUpdate')
 const onSlotUpdate = require('../lib/blocks/onSlotUpdate')
 const registerSupporter = require('../lib/blocks/registerSupporter')
 const genTestUser = require('../lib/blocks/generateTestUser')
+const genTestData = require('../lib/blocks/generateTestData')
 
 const run = async () => {
 
@@ -65,7 +66,7 @@ const run = async () => {
           await onSessionUpdate_mf.default()
         }
         else {
-          await onSessionUpdate.default()
+          return await onSessionUpdate.default()
         }
         return
       case 'onSlotUpdate/':
@@ -74,7 +75,7 @@ const run = async () => {
           await onSlotUpdate_mf.default()
         }
         else {
-          await onSlotUpdate.default()
+          return await onSlotUpdate.default()
         }
 
       case 'registerSupporter':
@@ -109,7 +110,10 @@ const run = async () => {
     }
   }
   else if (category.category === 'Generate Test Users') {
-    await genTestUser.default()
+    return await genTestUser.default()
+  }
+  else if (category.category === 'Generate Test Data') {
+    return await genTestData.default()
   }
   else if (category.category === 'Flush Emulators') {
     let yousure = await inquirer.yousure()
