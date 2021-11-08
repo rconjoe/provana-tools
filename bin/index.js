@@ -4,6 +4,7 @@ const figlet = require('figlet')
 const inquirer = require('../lib/inquirer')
 const Auth = require('../lib/auth')
 const db = require('../lib/db')
+const functions = require('../lib/functions')
 const util = require('../lib/util')
 const onSessionUpdate = require('../lib/blocks/onSessionUpdate')
 const onSlotUpdate = require('../lib/blocks/onSlotUpdate')
@@ -20,6 +21,13 @@ const run = async () => {
       { horizontalLayout: 'full' }
     )))
   )
+
+  let emulators = await inquirer.chooseEmulators()
+  if (emulators.emulators === true) {
+    Auth.auth.useEmulator('http://localhost:9099')
+    db.db.useEmulator('localhost', 8080)
+    functions.functions.useEmulator('localhost', 5001)
+  }
 
   let category = await inquirer.chooseCategory()
   if (category.category === 'Simulate User Input (Client SDK)') {
